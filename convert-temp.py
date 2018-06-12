@@ -54,21 +54,29 @@ class ConvertTemp(tk.Frame):
             self.c_to_f()
 
     def _add_widgets(self):
-        # This point to the input validation method
-        vcmd = (self.register(self.onValidate), '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
+        style = ttk.Style()                     # MacOSX Aqua glitch work around
+        style.theme_use('classic')
+        style.configure('basic.TRadiobutton', background='white', foreground='black')
+        style.map("TEntry", fieldbackground=[("active", "white"), ("disabled", "white")])
+        style.map("TEntry", foreground=[("active", "black"), ("disabled", "black")])
 
-        self.radio1 = ttk.Radiobutton(self, text="F\xb0 to C\xb0", variable=self.selection, value=1, command=self.radio_select)
+        vcmd = (self.register(self.onValidate), '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')     # input validation
+
+        self.radio1 = ttk.Radiobutton(self, text="F\xb0 to C\xb0", variable=self.selection, value=1,
+                                      style="basic.TRadiobutton", command=self.radio_select)
         self.radio1.grid(row=0, column=0)
-        self.radio2 = ttk.Radiobutton(self, text="C\xb0 to F\xb0", variable=self.selection, value=2, command=self.radio_select)
+        self.radio2 = ttk.Radiobutton(self, text="C\xb0 to F\xb0", variable=self.selection, value=2,
+                                      style="basic.TRadiobutton",command=self.radio_select)
         self.radio2.grid(row=1, column=0)
 
         # Create the input fields and wire the associated events
-        ttk.Label(self, text="Fahrenheit\xb0").grid(row=0, column=1, sticky=tk.E, padx=5)
+        ttk.Label(self, text="Fahrenheit\xb0", background="white").grid(row=0, column=1, sticky=tk.E, padx=5)
         self.f_entry = ttk.Entry(self, width=5, validate="all", textvariable=self.fahrenheit, validatecommand=vcmd)
         self.f_entry.bind("<FocusIn>", self.clear_widget)
+        self.f_entry.bind("<FocusOut>", self.validate_exit)
         self.f_entry.grid(row=0, column=2, sticky=tk.W)
 
-        ttk.Label(self, text="Celsius\xb0").grid(row=1, column=1, sticky=tk.E, padx=5)
+        ttk.Label(self, text="Celsius\xb0", background="white").grid(row=1, column=1, sticky=tk.E, padx=5)
         self.c_entry = ttk.Entry(self, width=5, validate="all", textvariable=self.celsius, validatecommand=vcmd)
         self.c_entry.bind("<FocusIn>", self.clear_widget)
         self.c_entry.grid(row=1, column=2, sticky=tk.W)
@@ -83,6 +91,9 @@ class ConvertTemp(tk.Frame):
         # Select F-->C First!
         self.selection.set(1)
         self.radio_select()
+
+    def validate_exit(self, event):
+        pass
 
     def onValidate(self, d, i, P, s, S, v, V, W):
         if self._is_number(S):
